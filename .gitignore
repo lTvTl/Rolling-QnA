@@ -1,0 +1,20 @@
+.DS_Store
+# Dependency directories (라이브러리 제외)
+node_modules/
+
+# OS test files (운영체제 찌꺼기 파일 제외)
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+
+# Environment variables (환경변수 파일 제외)
+.env
+.env.local
+
+# # Actual User Data (실제 사용자 데이터 제외)
+# data/users.csv
+# data/answers.csv
+# data/questions.csv
+
+antigravity-cli-harness/

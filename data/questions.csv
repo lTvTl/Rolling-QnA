@@ -1,0 +1,4 @@
+id,type,questionText,options,isAnonymous,creator
+q1,multiple,대한민국의 수도는 어디인가요?,서울;부산;대구;인천,false,admin
+q2,subjective,물(H2O)을 구성하고 있는 두 가지 화학 원소의 이름을 적어주세요.,,false,admin
+q3,essay,인공지능(AI)이 미래 사회 and 일자리에 미칠 영향에 대한 자신의 생각을 논술해 주세요.,,false,admin

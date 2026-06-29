@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolling QnA - 꼬리에 꼬리를 무는 질문 게시판</title>
+    <!-- Google Fonts: Outfit & Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Orbs for Ambient Glow -->
+    <div class="bg-glow-orb orb-1"></div>
+    <div class="bg-glow-orb orb-2"></div>
+    <div class="bg-glow-orb orb-3"></div>
+
+    <div class="app-container">
+        <!-- Header / Navigation -->
+        <header id="main-header" class="main-header hidden">
+            <div class="logo" id="header-logo" style="cursor: pointer;">
+                <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                <span class="logo-text">Q&A <span class="accent-text">Hub</span></span>
+            </div>
+            <div class="header-right">
+                <button id="btn-reveal-mode" class="btn-secondary hidden" style="border-radius: 50px; padding: 8px 16px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; border-color: var(--primary-light); color: var(--primary-light);">
+                    <i class="fa-solid fa-chart-simple"></i> 답변 통계
+                </button>
+                <span id="user-badge" class="user-badge">
+                    <i class="fa-solid fa-user"></i>
+                    <span id="header-username">User</span>
+                    <span id="header-role" class="role-tag">Standard</span>
+                </span>
+                <button id="btn-logout" class="btn-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> 로그아웃
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Views -->
+        <main class="main-content">
+            <!-- 1. LOGIN VIEW -->
+            <section id="view-login" class="view-section active">
+                <div class="login-card-wrapper">
+                    <div class="login-brand">
+                        <i class="fa-solid fa-graduation-cap brand-icon"></i>
+                        <h1>Q&A <span class="accent-text">Hub</span></h1>
+                        <p class="brand-subtitle"> 친구들과 질문하며 시간을 보내세요! </p>
+                    </div>
+                    
+                    <!-- Login Card -->
+                    <div id="card-login" class="login-card">
+                        <h2>로그인</h2>
+                        <p class="card-desc">등록된 계정으로 로그인해 주세요.</p>
+                        
+                        <div id="login-error" class="alert-box error hidden">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span class="alert-message">오류 발생</span>
+                        </div>
+
+                        <form id="login-form">
+                            <div class="input-group">
+                                <label for="login-username">아이디</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-user input-icon"></i>
+                                    <input type="text" id="login-username" placeholder="아이디를 입력하세요" required autocomplete="username">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="login-password">비밀번호</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-lock input-icon"></i>
+                                    <input type="password" id="login-password" placeholder="비밀번호를 입력하세요" required autocomplete="current-password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary btn-block">
+                                로그인 <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                            </button>
+                        </form>
+
+                        <div style="margin-top: 20px; text-align: center; font-size: 14px;">
+                            <span style="color: var(--text-muted);">계정이 없으신가요?</span>
+                            <button type="button" id="link-go-register" class="btn-text" style="color: var(--primary-light); font-weight: 700; font-size: 14px; margin-left: 4px;">회원가입</button>
+                        </div>
+
+                        <div class="login-tip hidden">
+                            <p><i class="fa-solid fa-lightbulb"></i> <strong>테스트용 계정 정보:</strong></p>
+                            <ul>
+                                <li>일반 사용자 1: <code>user1</code> / <code>user123</code></li>
+                                <li>일반 사용자 2: <code>user2</code> / <code>user234</code></li>
+                                <li>관리자 계정: <code>admin</code> / <code>admin123</code></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Register Card -->
+                    <div id="card-register" class="login-card hidden">
+                        <h2>회원가입</h2>
+                        <p class="card-desc">새로운 계정을 생성해 주세요.</p>
+                        
+                        <div id="register-error" class="alert-box error hidden">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span class="alert-message">오류 발생</span>
+                        </div>
+                        <div id="register-success" class="alert-box success hidden">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span class="alert-message">회원가입 완료! 로그인해 주세요.</span>
+                        </div>
+
+                        <form id="register-form">
+                            <div class="input-group">
+                                <label for="register-username">아이디</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-user input-icon"></i>
+                                    <input type="text" id="register-username" placeholder="사용할 아이디를 입력하세요" required autocomplete="username">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="register-password">비밀번호</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-lock input-icon"></i>
+                                    <input type="password" id="register-password" placeholder="사용할 비밀번호를 입력하세요" required autocomplete="new-password">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary btn-block">
+                                가입 완료 <i class="fa-solid fa-user-plus"></i>
+                            </button>
+                        </form>
+
+                        <div style="margin-top: 20px; text-align: center; font-size: 14px;">
+                            <span style="color: var(--text-muted);">이미 계정이 있으신가요?</span>
+                            <button type="button" id="link-go-login" class="btn-text" style="color: var(--primary-light); font-weight: 700; font-size: 14px; margin-left: 4px;">로그인</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. USER DASHBOARD VIEW -->
+            <section id="view-user-dashboard" class="view-section hidden">
+                <div class="dashboard-header">
+                    <div class="header-titles">
+                        <span class="sub-greeting">반가워요! 🙌</span>
+                        <h1 id="user-greeting">오늘의 질문 리스트</h1>
+                        <p class="dashboard-subtitle">나에게 배정된 질문들에 답하고 피드백을 완성해 보세요.</p>
+                    </div>
+                    <div class="stats-overview">
+                        <div class="stat-card">
+                            <div class="stat-num" id="stat-total">0</div>
+                            <div class="stat-label">전체 질문</div>
+                        </div>
+                        <div class="stat-card completed">
+                            <div class="stat-num" id="stat-completed">0</div>
+                            <div class="stat-label">답변 완료</div>
+                        </div>
+                        <div class="stat-card pending">
+                            <div class="stat-num" id="stat-pending">0</div>
+                            <div class="stat-label">미완료</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-divider"></div>
+
+                <div class="questions-grid-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2>질문 리스트 <span class="count-badge" id="questions-count">0</span></h2>
+                    <button id="btn-toggle-user-q-form" class="btn-secondary btn-sm" style="border-color: var(--primary-light); color: var(--primary-light);">
+                        <i class="fa-solid fa-plus-circle"></i> 질문 만들기
+                    </button>
+                </div>
+
+                <!-- User Question Form (Accordion) -->
+                <div id="user-q-form-container" class="glass-card hidden" style="margin-bottom: 30px; border-color: rgba(168, 85, 247, 0.25);">
+                    <h3 id="user-form-title"><i class="fa-solid fa-plus-circle"></i> 새 질문 만들기</h3>
+                    <p id="user-form-desc" class="card-desc">직접 만든 질문을 등록하여 동료들의 답변을 확인해 보세요.</p>
+                    
+                    <form id="user-new-question-form">
+                        <input type="hidden" id="user-q-input-edit-id" value="">
+                        
+                        <div class="input-group">
+                            <label for="user-q-input-type">질문 유형</label>
+                            <div class="input-wrapper select-wrapper">
+                                <i class="fa-solid fa-layer-group input-icon"></i>
+                                <select id="user-q-input-type" required>
+                                    <option value="" disabled selected>유형을 선택하세요</option>
+                                    <option value="subjective">주관식 (단답형)</option>
+                                    <option value="multiple">객관식 (선택형)</option>
+                                    <option value="essay">서술형 (논술형)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="user-q-input-text">질문 내용</label>
+                            <textarea id="user-q-input-text" rows="3" placeholder="사용자들에게 물어볼 질문 내용을 입력하세요" required></textarea>
+                        </div>
+
+                        <div class="input-group" style="display: flex; align-items: center; gap: 8px; margin-top: 10px; margin-bottom: 20px;">
+                            <input type="checkbox" id="user-q-input-anonymous" style="width: auto; cursor: pointer; height: 18px; margin: 0; padding: 0;">
+                            <label for="user-q-input-anonymous" style="margin-bottom: 0; cursor: pointer; font-size: 14px; font-weight: 600;">완전 익명 답변 모드 활성화</label>
+                        </div>
+
+                        <!-- Dynamic Options Input for Multiple Choice -->
+                        <div id="user-options-form-group" class="input-group hidden">
+                            <label>객관식 옵션 설정</label>
+                            <p class="field-tip">질문에 들어갈 객관식 문항들을 추가해 주세요.</p>
+                            <div id="user-options-container" class="options-setup-container">
+                                <!-- Inputs will be loaded dynamically -->
+                            </div>
+                            <button type="button" id="btn-user-add-option-field" class="btn-secondary btn-sm">
+                                <i class="fa-solid fa-plus"></i> 문항 추가
+                            </button>
+                        </div>
+
+                        <div id="user-q-create-success" class="alert-box success hidden">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span class="alert-message">성공적으로 등록되었습니다.</span>
+                        </div>
+
+                        <div id="user-q-create-error" class="alert-box error hidden">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <span class="alert-message">생성 실패</span>
+                        </div>
+
+                        <div style="display: flex; gap: 12px;">
+                            <button type="submit" id="btn-user-submit-question" class="btn-primary" style="flex-grow: 1;">
+                                <i class="fa-solid fa-circle-plus"></i> 질문 등록하기
+                            </button>
+                            <button type="button" id="btn-user-cancel-question" class="btn-secondary" style="flex-shrink: 0;">
+                                취소
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="questions-grid" class="questions-grid">
+                    <!-- Cards will be dynamically injected here -->
+                </div>
+            </section>
+
+            <!-- 3. QUESTION DETAIL VIEW -->
+            <section id="view-question-detail" class="view-section hidden">
+                <div class="back-nav">
+                    <button id="btn-back-dashboard" class="btn-text">
+                        <i class="fa-solid fa-arrow-left"></i> 대시보드로 돌아가기
+                    </button>
+                </div>
+
+                <div class="detail-card-container">
+                    <div class="question-detail-card">
+                        <div class="q-detail-header">
+                            <span id="detail-q-type" class="badge-type">서술형</span>
+                            <span id="detail-q-status" class="badge-status pending">미완료</span>
+                            <span id="detail-q-anon" class="badge-status" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); display: none;"><i class="fa-solid fa-user-secret"></i> 완전 익명 답변</span>
+                        </div>
+
+                        <h2 id="detail-q-text" class="question-title-large">질문 내용이 여기에 들어갑니다.</h2>
+                        
+                        <div class="content-divider"></div>
+
+                        <form id="answer-form">
+                            <input type="hidden" id="detail-q-id">
+                            
+                            <!-- Dynamic Answer Input Area -->
+                            <div id="dynamic-answer-area" class="answer-area">
+                                <!-- Will contain: textarea, radio options, or input text -->
+                            </div>
+
+                            <div id="answer-success" class="alert-box success hidden">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span class="alert-message">답변이 성공적으로 제출되었습니다!</span>
+                            </div>
+
+                            <div id="answer-error" class="alert-box error hidden">
+                                <i class="fa-solid fa-circle-exclamation"></i>
+                                <span class="alert-message">제출 오류 발생</span>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" id="btn-submit-answer" class="btn-primary">
+                                    <i class="fa-solid fa-paper-plane"></i> 답변 제출하기
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ADMIN DASHBOARD VIEW -->
+            <section id="view-admin-dashboard" class="view-section hidden">
+                <div class="admin-grid">
+                    <!-- Left Column: Add Question Form -->
+                    <div class="admin-column form-col">
+                        <div class="glass-card">
+                            <h2 id="admin-form-title"><i class="fa-solid fa-plus-circle"></i> 새 질문 생성하기</h2>
+                            <p id="admin-form-desc" class="card-desc">다양한 형식의 질문을 만들어 사용자에게 배정하세요.</p>
+                            
+                            <form id="new-question-form">
+                                <input type="hidden" id="q-input-edit-id" value="">
+                                
+                                <div class="input-group">
+                                    <label for="q-input-type">질문 유형</label>
+                                    <div class="input-wrapper select-wrapper">
+                                        <i class="fa-solid fa-layer-group input-icon"></i>
+                                        <select id="q-input-type" required>
+                                            <option value="" disabled selected>유형을 선택하세요</option>
+                                            <option value="subjective">주관식 (단답형)</option>
+                                            <option value="multiple">객관식 (선택형)</option>
+                                            <option value="essay">서술형 (논술형)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="q-input-text">질문 내용</label>
+                                    <textarea id="q-input-text" rows="3" placeholder="사용자에게 물어볼 질문 내용을 입력하세요" required></textarea>
+                                </div>
+
+                                <div class="input-group" style="display: flex; align-items: center; gap: 8px; margin-top: 10px; margin-bottom: 20px;">
+                                    <input type="checkbox" id="q-input-anonymous" style="width: auto; cursor: pointer; height: 18px; margin: 0; padding: 0;">
+                                    <label for="q-input-anonymous" style="margin-bottom: 0; cursor: pointer; font-size: 14px; font-weight: 600;">완전 익명 답변 모드 활성화</label>
+                                </div>
+
+                                <!-- Dynamic Options Input for Multiple Choice -->
+                                <div id="options-form-group" class="input-group hidden">
+                                    <label>객관식 옵션 설정</label>
+                                    <p class="field-tip">질문에 들어갈 객관식 문항들을 추가해 주세요.</p>
+                                    <div id="options-container" class="options-setup-container">
+                                        <!-- Inputs will be loaded dynamically -->
+                                    </div>
+                                    <button type="button" id="btn-add-option-field" class="btn-secondary btn-sm">
+                                        <i class="fa-solid fa-plus"></i> 문항 추가
+                                    </button>
+                                </div>
+
+                                <div id="admin-create-success" class="alert-box success hidden">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span class="alert-message">성공적으로 등록되었습니다.</span>
+                                </div>
+
+                                <div id="admin-create-error" class="alert-box error hidden">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                    <span class="alert-message">생성 실패</span>
+                                </div>
+
+                                <button type="submit" id="btn-submit-question" class="btn-primary btn-block">
+                                    <i class="fa-solid fa-circle-plus"></i> 질문 등록하기
+                                </button>
+                                
+                                <button type="button" id="btn-cancel-edit-question" class="btn-secondary btn-block hidden" style="margin-top: 8px;">
+                                    <i class="fa-solid fa-xmark"></i> 수정 취소
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Question List and Answers Overview -->
+                    <div class="admin-column data-col">
+                        <div class="tabs-container">
+                            <div class="tabs-header">
+                                <button class="tab-btn active" data-tab="tab-questions">
+                                    <i class="fa-solid fa-list-check"></i> 등록된 질문 리스트
+                                </button>
+                                <button class="tab-btn" data-tab="tab-answers">
+                                    <i class="fa-solid fa-comments"></i> 실시간 사용자 답변 현황
+                                </button>
+                            </div>
+
+                            <div class="tabs-content">
+                                <!-- Tab 1: Questions List -->
+                                <div id="tab-questions" class="tab-pane active">
+                                    <div class="pane-header">
+                                        <h3>전체 등록 문항 <span class="count-badge" id="admin-q-count">0</span></h3>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>유형</th>
+                                                    <th>질문 내용</th>
+                                                    <th>옵션 개수</th>
+                                                    <th>관리</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="admin-questions-tbody">
+                                                <!-- Questions list injected here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Tab 2: Answers Overview -->
+                                <div id="tab-answers" class="tab-pane">
+                                    <div class="pane-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                                        <div>
+                                            <h3 style="margin-bottom: 0;">사용자 제출 답변 리스트 <span class="count-badge" id="admin-ans-count">0</span></h3>
+                                        </div>
+                                        <div class="filter-controls" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                                            <!-- Question selector -->
+                                            <div class="input-wrapper select-wrapper" style="width: 240px; margin-bottom: 0;">
+                                                <i class="fa-solid fa-filter input-icon" style="left: 12px; font-size: 13px; color: var(--text-muted);"></i>
+                                                <select id="admin-answers-q-filter" style="padding: 8px 12px 8px 36px; font-size: 13px; height: 38px; border-radius: var(--radius-sm);">
+                                                    <option value="">모든 질문 답변 보기</option>
+                                                </select>
+                                            </div>
+                                            <!-- Mode Selector Buttons -->
+                                            <div class="mode-toggle-group" style="display: flex; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); padding: 2px;">
+                                                <button type="button" id="btn-mode-standard" class="btn-toggle active" style="background: var(--primary); color: white; border: none; padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: var(--transition);">
+                                                    <i class="fa-solid fa-user-check"></i> 기본 모드
+                                                </button>
+                                                <button type="button" id="btn-mode-anon" class="btn-toggle" style="background: transparent; color: var(--text-muted); border: none; padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: var(--transition);">
+                                                    <i class="fa-solid fa-user-secret"></i> 익명 모드
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-container">
+                                        <table class="data-table">
+                                            <thead>
+                                                <tr>
+                                                    <th id="th-username">작성자</th>
+                                                    <th>질문 유형</th>
+                                                    <th>질문 내용</th>
+                                                    <th>제출한 답변</th>
+                                                    <th>시간</th>
+                                                    <th>관리</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="admin-answers-tbody">
+                                                <!-- Submissions list injected here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. REVEAL INTRO VIEW -->
+            <section id="view-reveal-intro" class="view-section hidden">
+                <div class="login-card-wrapper" style="min-height: calc(75vh - 100px);">
+                    <div class="glass-card" style="max-width: 520px; width: 100%; text-align: center; padding: 48px 40px; border-radius: var(--radius-lg);">
+                        <i class="fa-solid fa-gamepad" style="font-size: 56px; color: var(--primary-light); margin-bottom: 24px; filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.4));"></i>
+                        <h2 style="font-size: 28px; margin-bottom: 16px;">💡 안내사항</h2>
+                        <div class="content-divider" style="margin: 20px 0;"></div>
+                        <p style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 28px; line-height: 1.5; background: linear-gradient(135deg, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                            "게임은 게임일뿐 즐깁시다"
+                        </p>
+                        <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 36px; line-height: 1.6;">
+                            모든 답변은 재미를 위해 공개되며, 다른 사람의 답변에 상처받거나 과몰입하지 않도록 주의해 주세요!
+                        </p>
+                        <button id="btn-reveal-proceed" class="btn-primary btn-block" style="padding: 16px;">
+                            결과 확인하기 <i class="fa-solid fa-circle-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. REVEAL DASHBOARD VIEW -->
+            <section id="view-reveal-dashboard" class="view-section hidden">
+                <div class="dashboard-header" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <button id="btn-reveal-back" class="btn-text" style="margin-bottom: 12px;">
+                            <i class="fa-solid fa-arrow-left"></i> 대시보드로 돌아가기
+                        </button>
+                        <h1>📊 답변 공개 모드</h1>
+                        <p class="dashboard-subtitle">사용자들의 익명/실명 답변 통계 및 개별 답변 내용을 확인합니다.</p>
+                    </div>
+                    
+                    <!-- Global Reveal Mode Standard/Anon Toggle -->
+                    <div class="mode-toggle-group" style="display: flex; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); padding: 2px; height: 42px; align-items: center;">
+                        <button type="button" id="btn-reveal-mode-anon" class="btn-toggle active" style="background: var(--primary); color: white; border: none; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-user-secret"></i> 익명 모드
+                        </button>
+                        <button type="button" id="btn-reveal-mode-standard" class="btn-toggle" style="background: transparent; color: var(--text-muted); border: none; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-user-check"></i> 기본 모드
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-divider" style="margin-bottom: 32px;"></div>
+
+                <div id="reveal-questions-container" style="display: flex; flex-direction: column; gap: 28px;">
+                    <!-- Question Reveal Cards will be dynamically injected here -->
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 꼬리에 꼬리를 무는 질문들</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
